@@ -7,6 +7,8 @@ public class AdMechDriver {
 
 public static void main(String [] args) {
 		
+		AdMech lst = new AdMech();
+	
 		Scanner question = new Scanner(System.in);
 		
 		System.out.println("You want a list?");
@@ -18,9 +20,9 @@ public static void main(String [] args) {
 			System.out.println("Ok bye!");
 		}
 		
-		else {
+		else {			
 			
-			ArrayList<String> list = AdMech.retrieve();
+			ArrayList<String> list = lst.retrieve();
 			
 			for(int i = 0; i < list.size(); i++) {
 			
