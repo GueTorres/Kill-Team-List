@@ -6,33 +6,47 @@ import java.util.Random;
 public class AdMech {
 	
 
-		//1st step create an ArrayList that holds every possible combination of squad
-		//2nd step apply point values to each variation
-		//3rd step make combinations w/applied values using an 100 point limit
-		//4th step try various limits based on current inventory
-		
-		
-		static int points = 0;
-		
-		static String combi = null;
-		
-		static AdMech D = new AdMech(points, combi, null);
-		
-		static AdMech head = D;
-		
-		static AdMech previous = null;
-		
-		static AdMech next;
+	//1st step create an ArrayList that holds every possible combination of squad
+	//2nd step apply point values to each variation
+	//**3rd step make combinations w/applied values using an 100 point limit
+	//4th step try various limits based on current inventory
+	
+	private int points;	
+	private String combi;	
+	private AdMechNode D = null;
 		
 		
 		
+	public ArrayList<String> retrieve() {
+			
+		ArrayList<String> lst = new ArrayList<String>();
 		
+		if(isEmpty()) D = new AdMechNode(points,combi,null);
+			
+		else { lst = D.retrieve();}
 		
-	 	public AdMech(int points, String combi, AdMech next) {
+		return lst;
+	}
 		
-			AdMech.points = points;
-			AdMech.combi = combi;
-			AdMech.next = next;
+	public boolean isEmpty() { return D == null;}
+		
+	public class AdMechNode{
+		
+		int points = 0;
+		
+		String combi = null;
+		
+		AdMechNode head = D;
+		
+		AdMechNode previous = null;
+		
+		AdMechNode next;
+		
+		public AdMechNode(int points, String combi, AdMechNode d) {
+		
+			this.points = points;
+			this.combi = combi;
+			this.next = d;
 		
 		}
 
@@ -41,17 +55,18 @@ public class AdMech {
 			return head == null;
 		}
 		
-		public static ArrayList<String> retrieve() { //collects Nodes randomly to apply to createList()
-			
+		public ArrayList<String> retrieve() { //collects Nodes randomly to apply to createList()
+						
+					
 			assignment();
 			
-			ArrayList<AdMech> AM_random = new ArrayList<AdMech>();
-			ArrayList<AdMech> AM_list = new ArrayList<AdMech>();
+			ArrayList<AdMechNode> AM_random = new ArrayList<AdMechNode>();
+			ArrayList<AdMechNode> AM_list = new ArrayList<AdMechNode>();
 			Random rand = new Random();
 			
-			if(AdMech.next != D) {
-				AM_list.add(AdMech.next);
-				previous = AdMech.next;
+			if(previous.next != D) {
+				AM_list.add(previous.next);
+				previous = previous.next;
 				retrieve();
 			}
 						
@@ -66,17 +81,20 @@ public class AdMech {
 			
 		}
 		
-		public static void insert(int points, String combi) { //insert new Nodes
+		public  void insert(int points, String combi) { //insert new Nodes
 		
-			if(previous != null) {
-			AdMech.next = new AdMech(points,combi, D);
+			if(previous == null) {
+				
+			AdMechNode D = new AdMechNode(points, combi, null);
+				
+			previous.next = new AdMechNode(points,combi, D);
 		
-			previous = AdMech.next;
+			previous = previous.next;
 			}
-			else	previous = new AdMech(points,combi, D);
+			else	previous.next = new AdMechNode(points,combi, D);
 		}
 
-		public static void assignment() { //Point assignment
+		public void assignment() { //Point assignment
 
 			ArrayList<String> combi = combi();
 		
@@ -88,34 +106,32 @@ public class AdMech {
 			}
 		}
 		
-		public static ArrayList<String> createList(ArrayList<AdMech> AM_random){ //provides an array of stats to create the 100 point rosters
+		public ArrayList<String> createList(ArrayList<AdMechNode> AM_random){ //provides an array of stats to create the 100 point rosters
 			
-			ArrayList<AdMech> u_list = new ArrayList<AdMech>();
+			ArrayList<AdMechNode> u_list = new ArrayList<AdMechNode>();
 			
 			ArrayList<String> stats = new ArrayList<String>();
 			
 			int roster = 0;
 			
 			for(int i = 0; i < AM_random.size(); i++) {
-				AM_random.get(i);
-				roster += AdMech.points;
+				roster += AM_random.get(i).points;
 				if(roster <= 100 ) { 
 						u_list.add(AM_random.get(i));
 				}
 			}
 			
 			for(int j = 0; j < u_list.size(); j++) {
-				u_list.get(j);
-				u_list.get(j);
-				stats.add("Candidate: " + AdMech.combi + 
-				"/nPoints per Model Configuration: " + AdMech.points);
+								
+				stats.add("Candidate: " + u_list.get(j).combi + 
+				"/nPoints per Model Configuration: " + u_list.get(j).points);
 				
 			}
 			
 			return stats;
 		}
 
-		public static ArrayList<String> combi() {
+		public ArrayList<String> combi() {
 		
 			String vanguard = " Skitarii Vanguard ";
 			String ranger = " Skitarii Ranger ";
@@ -326,7 +342,7 @@ public class AdMech {
 		return troops;
 	}
 		
-		public static int [] points(ArrayList<String> troops) {
+		public int [] points(ArrayList<String> troops) {
 		
 		int [] points = {troops.size()};
 		for(int i = 0; i < troops.size(); i++) {
@@ -361,6 +377,8 @@ public class AdMech {
 		
 		}
 		return points;
+	}
+		
 	}
 
 	}
