@@ -60,19 +60,8 @@ public class AdMech {
 
 		public boolean isEmpty() {return head == null;}
 		
-		public ArrayList<String> retrieve() { //collects Nodes randomly to apply to createList()
+		public ArrayList<String> retrieve(ArrayList<AdMechNode> AM_list) { //collects Nodes randomly to apply to createList()
 											
-			if(previous.next == D){ 
-				previous = previous.next; 
-				retrieve(); 
-			}
-			
-			if(previous.next != D) {
-				AM_list.add(previous.next);
-				previous = previous.next; 
-				retrieve(); 
-			}
-						
 			for(int i = 0; i < AM_list.size(); i++) {
 				int generate = rand.nextInt((AM_list.size() - 1) - i);
 				AM_random.add(AM_list.get(generate));
@@ -98,16 +87,17 @@ public class AdMech {
 			for(int q = 0; q < points.length; q++) {
 			
 				previous.next = new AdMechNode(points[q], combi.get(q), D);
+				AM_list.add(previous.next);
 				previous = previous.next;
 								
 			}
 			
-			previous.next = D;
+			previous.next = D;			
 			
-			return retrieve();
+			return retrieve(AM_list);
 		}
 		
-		public ArrayList<String> createList(ArrayList<AdMechNode> AM_random){//provides an array of stats to create the 100 point rosters
+		public ArrayList<String> createList(ArrayList<AdMechNode> AM_Random){//provides an array of stats to create the 100 point rosters
 			
 			ArrayList<AdMechNode> u_list = new ArrayList<AdMechNode>();
 			
@@ -115,12 +105,12 @@ public class AdMech {
 			
 			int roster = 0;
 			
-			for(int i = 0; i < AM_random.size(); i++) {
-				roster += AM_random.get(i).points;
+			for(int i = 0; i < AM_Random.size(); i++) {
+				roster += AM_Random.get(i).points;
 				
-				if(roster <= 100 ) u_list.add(AM_random.get(i));
+				if(roster <= 100 ) u_list.add(AM_Random.get(i));
 				
-				if(roster > 100 ) roster -= AM_random.get(i).points;
+				if(roster > 100 ) roster -= AM_Random.get(i).points;
 			}
 			
 			for(int j = 0; j < u_list.size(); j++) {
