@@ -22,7 +22,7 @@ public class AdMech {
 		ArrayList<String> lst = new ArrayList<String>();
 		
 		if(isEmpty()) {
-			D = new AdMechNode(points,combi,null); 
+			D = new AdMechNode(points, combi, null); 
 		}
 			
 		lst = D.assignment();
@@ -38,7 +38,7 @@ public class AdMech {
 		
 		private AdMechNode head = D;
 				
-		private AdMechNode previous = null;
+		private AdMechNode previous = D;
 				
 		private AdMechNode next;
 		
@@ -71,12 +71,6 @@ public class AdMech {
 			return stats;
 			
 		}
-		
-		/**public void insert(int points, String combi) { //insert new Nodes
-							
-			current.next = new AdMechNode(points,combi,tail);
-			current = current.next;
-		}**/
 
 		public ArrayList<String> assignment() { //Point assignment
 
@@ -171,8 +165,8 @@ public class AdMech {
 
 			for(int i = 0; i < squad.length; i++) {
 		
-				if(squad[i] == vanguard) {	//galvanic rifle and omnispex or edt or nothing
-					vanguard += grifle;
+				if(squad[i] == vanguard) {	// radium carbine and omnispex or edt or nothing
+					vanguard += rcarbine;
 					for(int j = 0; j < tool.length; j++) {
 						vanguard += tool[j];
 						troops.add(vanguard);
@@ -180,8 +174,8 @@ public class AdMech {
 					}
 				}
 		
-				if(squad[i] == ranger) {	//radium carbine and omnispex or edt or nothing
-					ranger += rcarbine;
+				if(squad[i] == ranger) {	//galvanic rifle and omnispex or edt or nothing
+					ranger += grifle;
 					for(int j = 0; j < tool.length; j++) {
 						ranger += tool[j];
 						troops.add(ranger);
