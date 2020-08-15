@@ -6,77 +6,73 @@ import java.util.Random;
 public class AdMech {
 	
 
-		//1st step create an ArrayList that holds every possible combination of squad
-		//2nd step apply point values to each variation
-		//3rd step make combinations w/applied values using an 100 point limit
-		//4th step try various limits based on current inventory
+	//1st step create an ArrayList that holds every possible combination of squad
+	//2nd step apply point values to each variation
+	//**3rd step make combinations w/applied values using an 100 point limit
+	//4th step try various limits based on current inventory
+	
+	private int points;	
+	private String combi;	
+	private AdMechNode D = null;
 		
+	public boolean isEmpty() { return D == null;}	
 		
-		static int points = 0;
+	public ArrayList<String> assignment() {
+			
+		ArrayList<String> lst = new ArrayList<String>();
 		
-		static String combi = null;
+		if(isEmpty()) {
+			D = new AdMechNode(points, combi, null); 
+		}
+			
+		lst = D.assignment();
 		
-		static AdMech D = new AdMech(points, combi, null);
+		return lst;
+	}
 		
-		static AdMech head = D;
+	public class AdMechNode{
 		
-		static AdMech previous = null;
+		private int points;
 		
-		static AdMech next;
+		private String combi;
 		
+		private AdMechNode head = D;
+				
+		private AdMechNode previous = D;
+				
+		private AdMechNode next;
 		
+		private ArrayList<AdMechNode> AM_random = new ArrayList<AdMechNode>();
 		
+		private ArrayList<AdMechNode> AM_list = new ArrayList<AdMechNode>();
 		
+		private Random rand = new Random();
 		
-	 	public AdMech(int points, String combi, AdMech next) {
+		private ArrayList<String> stats;
 		
-			AdMech.points = points;
-			AdMech.combi = combi;
-			AdMech.next = next;
+		public AdMechNode(int points, String combi, AdMechNode next) {
+		
+			this.points = points;
+			this.combi = combi;
+			this.next = next;
 		
 		}
 
-		public boolean isEmpty() {
-			
-			return head == null;
-		}
+		public boolean isEmpty() {return head == null;}
 		
-		public static ArrayList<String> retrieve() { //collects Nodes randomly to apply to createList()
-			
-			assignment();
-			
-			ArrayList<AdMech> AM_random = new ArrayList<AdMech>();
-			ArrayList<AdMech> AM_list = new ArrayList<AdMech>();
-			Random rand = new Random();
-			
-			if(AdMech.next != D) {
-				AM_list.add(AdMech.next);
-				previous = AdMech.next;
-				retrieve();
-			}
-						
+		public ArrayList<String> retrieve(ArrayList<AdMechNode> AM_list) { //collects Nodes randomly to apply to createList()
+											
 			for(int i = 0; i < AM_list.size(); i++) {
 				int generate = rand.nextInt((AM_list.size() - 1) - i);
 				AM_random.add(AM_list.get(generate));
 			}
-			
-			
-			ArrayList<String> stats = createList(AM_random);
+						
+			stats = createList(AM_random);
 			return stats;
 			
 		}
-		
-		public static void insert(int points, String combi) { //insert new Nodes
-		
-			if(previous != null) {
-			AdMech.next = new AdMech(points,combi, D);
-		
-			previous = AdMech.next;
-			}
-			else	previous = new AdMech(points,combi, D);
-		}
 
-		public static void assignment() { //Point assignment
+		public ArrayList<String> assignment() { //Point assignment
 
 			ArrayList<String> combi = combi();
 		
@@ -84,38 +80,44 @@ public class AdMech {
 		
 			for(int q = 0; q < points.length; q++) {
 			
-				insert(points[q], combi.get(q));
+				previous.next = new AdMechNode(points[q], combi.get(q), D);
+				AM_list.add(previous.next);
+				previous = previous.next;
+								
 			}
+			
+			previous.next = D;			
+			
+			return retrieve(AM_list);
 		}
 		
-		public static ArrayList<String> createList(ArrayList<AdMech> AM_random){ //provides an array of stats to create the 100 point rosters
+		public ArrayList<String> createList(ArrayList<AdMechNode> AM_Random){//provides an array of stats to create the 100 point rosters
 			
-			ArrayList<AdMech> u_list = new ArrayList<AdMech>();
+			ArrayList<AdMechNode> u_list = new ArrayList<AdMechNode>();
 			
 			ArrayList<String> stats = new ArrayList<String>();
 			
 			int roster = 0;
 			
-			for(int i = 0; i < AM_random.size(); i++) {
-				AM_random.get(i);
-				roster += AdMech.points;
-				if(roster <= 100 ) { 
-						u_list.add(AM_random.get(i));
-				}
+			for(int i = 0; i < AM_Random.size(); i++) {
+				roster += AM_Random.get(i).points;
+				
+				if(roster <= 100 ) u_list.add(AM_Random.get(i));
+				
+				if(roster > 100 ) roster -= AM_Random.get(i).points;
 			}
 			
 			for(int j = 0; j < u_list.size(); j++) {
-				u_list.get(j);
-				u_list.get(j);
-				stats.add("Candidate: " + AdMech.combi + 
-				"/nPoints per Model Configuration: " + AdMech.points);
+								
+				stats.add("Candidate: " + u_list.get(j).combi + 
+				"/nPoints per Model Configuration: " + u_list.get(j).points);
 				
 			}
 			
 			return stats;
 		}
 
-		public static ArrayList<String> combi() {
+		public ArrayList<String> combi() {//keywording different types of troops
 		
 			String vanguard = " Skitarii Vanguard ";
 			String ranger = " Skitarii Ranger ";
@@ -129,104 +131,104 @@ public class AdMech {
 			String iprinceps = " Infiltrator Princeps ";
 
 			String ospex = " Omnispex ";
-		String edTether = " Enhanced Data-Tether ";
-		String amaul = " Arc Maul ";
-		String psword = " Power Sword ";
-		String rpistol = " Radium Pistol ";
-		String rcarbine = " Radium Carbine ";
-		String grifle = " Galvanic Rifle ";
-		String fblaster = " Flechette Blaster ";
-		String pbpistol = " Phosphor Blast Pistol ";
-		String apistol = " Arc Pistol ";
-		String pcaliver = " Plasma Caliver ";
-		String arifle = " Arc Rifle ";
-		String tarquebus = " Transuranic Arquebus ";
-		String tblades = " Transuranic Blades ";
-		String trazor = " Transuranic Razor ";
-		String cclaw = " Chordclaw ";
-		String scarbine = " Stubcarbine ";
-		String tgoad = " Taser Goad ";
+			String edTether = " Enhanced Data-Tether ";
+			String amaul = " Arc Maul ";
+			String psword = " Power Sword ";
+			String rpistol = " Radium Pistol ";
+			String rcarbine = " Radium Carbine ";
+			String grifle = " Galvanic Rifle ";
+			String fblaster = " Flechette Blaster ";
+			String pbpistol = " Phosphor Blast Pistol ";
+			String apistol = " Arc Pistol ";
+			String pcaliver = " Plasma Caliver ";
+			String arifle = " Arc Rifle ";
+			String tarquebus = " Transuranic Arquebus ";
+			String tblades = " Transuranic Blades ";
+			String trazor = " Transuranic Razor ";
+			String cclaw = " Chordclaw ";
+			String scarbine = " Stubcarbine ";
+			String tgoad = " Taser Goad ";
 
 
-		String [] wargear = new String[] {amaul, psword, rpistol, rcarbine, grifle, fblaster, pbpistol, apistol,
+			String [] wargear = new String[] {amaul, psword, rpistol, rcarbine, grifle, fblaster, pbpistol, apistol,
 										pcaliver, arifle, tarquebus, tblades, trazor, cclaw, scarbine, tgoad};
 
-		String [] tool = new String[] {ospex, edTether, null};
+			String [] tool = new String[] {ospex, edTether, null};
 
-		String [] squad = new String[]{vanguard, ranger, rgunner, vgunner, valpha, ralpha,
+			String [] squad = new String[]{vanguard, ranger, rgunner, vgunner, valpha, ralpha,
 			  						ruststalker, infiltrator, rprinceps, iprinceps};
 
-		ArrayList<String> troops = new ArrayList<String> ();
+			ArrayList<String> troops = new ArrayList<String>();
 
 
-		 //may need to add a to each conditional
+			//may need to add a to each conditional
 
-		for(int i = 0; i < squad.length; i++) {
+			for(int i = 0; i < squad.length; i++) {
 		
-			if(squad[i] == vanguard) {	//galvanic rifle and omnispex or edt or nothing
-				vanguard += grifle;
-				for(int j = 0; j < tool.length; j++) {
-					vanguard += tool[j];
-					troops.add(vanguard);
+				if(squad[i] == vanguard) {	// radium carbine and omnispex or edt or nothing
+					vanguard += rcarbine;
+					for(int j = 0; j < tool.length; j++) {
+						vanguard += tool[j];
+						troops.add(vanguard);
 					
+					}
 				}
-			}
 		
-			if(squad[i] == ranger) {	//radium carbine and omnispex or edt or nothing
-				ranger += rcarbine;
-				for(int j = 0; j < tool.length; j++) {
-					ranger += tool[j];
-					troops.add(ranger);
+				if(squad[i] == ranger) {	//galvanic rifle and omnispex or edt or nothing
+					ranger += grifle;
+					for(int j = 0; j < tool.length; j++) {
+						ranger += tool[j];
+						troops.add(ranger);
 					
+					}
 				}
-			}
 		
-			if(squad[i] == rgunner) {	// galvanic rifle or arc rifle or plasma caliver or transuranic arquebus
-				for(int j = 0; j < wargear.length; j++) {
-					if(wargear[j] == grifle || wargear[j] == arifle || wargear[j] == pcaliver || wargear[j] == tarquebus) {
-						rgunner += wargear[j];
-						troops.add(rgunner);
+				if(squad[i] == rgunner) {	// galvanic rifle or arc rifle or plasma caliver or transuranic arquebus
+					for(int j = 0; j < wargear.length; j++) {
+						if(wargear[j] == grifle || wargear[j] == arifle || wargear[j] == pcaliver || wargear[j] == tarquebus) {
+							rgunner += wargear[j];
+							troops.add(rgunner);
 						
+						}
 					}
 				}
-			}
 		
-			if(squad[i] == vgunner) {	//radium carbine or (arc maul or power sword and radium pistol or phosphor blast pistol
-				for(int j = 0; j < wargear.length; j++) {
-					if(wargear[j] == grifle || wargear[j] == arifle || wargear[j] == pcaliver || wargear[j] == tarquebus) {
-						vgunner += wargear[j];
-						troops.add(vgunner);
+				if(squad[i] == vgunner) {	//radium carbine or (arc maul or power sword and radium pistol or phosphor blast pistol
+					for(int j = 0; j < wargear.length; j++) {
+						if(wargear[j] == grifle || wargear[j] == arifle || wargear[j] == pcaliver || wargear[j] == tarquebus) {
+							vgunner += wargear[j];
+							troops.add(vgunner);
 						
+						}
 					}
 				}
-			}
 		
-			if(squad[i] == ralpha) { //galvanic rifle or (arc maul or power sword and radium pistol or phosphor blast pistol)
-				for(int j = 0; j < wargear.length; j++) {
-					if(wargear[j] == grifle) {
-					ralpha += wargear[j];
-					troops.add(ralpha);
-					}
-					if(wargear[j] == amaul || wargear[j] == psword) {
-						ralpha += wargear[j];
-									
-						for(int k = 0; k < wargear.length; k++) {
-							if(wargear[k] == rpistol || wargear[k] == pbpistol) {
-							ralpha += wargear[k];
+				if(squad[i] == ralpha) { //galvanic rifle or (arc maul or power sword and radium pistol or phosphor blast pistol)
+					for(int j = 0; j < wargear.length; j++) {
+						if(wargear[j] == grifle) {
+							ralpha += wargear[j];
 							troops.add(ralpha);
+						}
+						if(wargear[j] == amaul || wargear[j] == psword) {
+							ralpha += wargear[j];
+									
+							for(int k = 0; k < wargear.length; k++) {
+								if(wargear[k] == rpistol || wargear[k] == pbpistol) {
+									ralpha += wargear[k];
+									troops.add(ralpha);
 							
+								}
+						
 							}
 						
 						}
-						
-					}
+					}	
 				}
-			}
 			
-			if(squad[i] == valpha) { //galvanic rifle or (arc maul or power sword and radium pistol or phosphor blast pistol)
-				for(int j = 0; j < wargear.length; j++) {
-					if(wargear[j] == grifle) {
-						valpha += wargear[j];
+				if(squad[i] == valpha) { //galvanic rifle or (arc maul or power sword and radium pistol or phosphor blast pistol)
+					for(int j = 0; j < wargear.length; j++) {
+						if(wargear[j] == grifle) {
+							valpha += wargear[j];
 						troops.add(valpha);
 						
 					}
@@ -326,44 +328,46 @@ public class AdMech {
 		return troops;
 	}
 		
-		public static int [] points(ArrayList<String> troops) {
+		public int [] points(ArrayList<String> troops) {//points for troops
 		
-		int [] points = {troops.size()};
-		for(int i = 0; i < troops.size(); i++) {
-			
-			String str = troops.get(i); 
-			String split[] = str.split(" ", 0); 
-			for(String s:split) {
+			int [] points = {troops.size()};
+			for(int i = 0; i < troops.size(); i++) {
+												//keywords each troops String, adding points depending on the keyword
+				String str = troops.get(i); 	
+				String split[] = str.split(" ", 0); 
+				for(String s:split) {
+					
+					if(s == " Skitarii ") points[i] = 9;
+					
+					if(s == " Alpha ") points[i] = 10;
 				
-				if(s == " Alpha ") points[i] = 10;
+					if(s == " Gunner ") points[i] = 10;
+													
+					if(s == " Sicarian ") points[i] = 14;
 				
-				if(s == " Gunner ") points[i] = 10;
+					if(s == " Princeps ") points[i] = 15;
 				
-				if(s == " Skitarii ") points[i] = 9;
+					if(s == " Enhanced ") points[i] += 5;
 				
-				if(s == " Sicarian ") points[i] = 14;
+					if(s == " Omnispex ") points[i] += 1;
 				
-				if(s == " Princeps ") points[i] = 15;
+					if(s == " Chordclaw ") points[i] += 1;
 				
-				if(s == " Enhanced ") points[i] += 5;
+					if(s == " Taser ") points[i] += 1;
 				
-				if(s == " Omnispex ") points[i] += 1;
+					if(s == " Plasma ") points[i] += 3;
 				
-				if(s == " Chordclaw ") points[i] += 1;
-				
-				if(s == " Taser ") points[i] += 1;
-				
-				if(s == " Plasma ") points[i] += 3;
-				
-				if(s == " Arquebus ") points[i] += 5;
+					if(s == " Arquebus ") points[i] += 5;
 							
-			}
+				}
 		
+			}
+			return points;
 		}
-		return points;
+		
 	}
 
-	}
+}
 
 
 
